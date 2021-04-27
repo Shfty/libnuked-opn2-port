@@ -6,4 +6,3 @@ edition = "2018"
 
 [dependencies]
 bitflags = "1.2.1"
-opl2 = { path = "../opl2" }
