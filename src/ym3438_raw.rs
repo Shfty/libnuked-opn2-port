@@ -340,7 +340,7 @@ impl Ym3438Raw {
         let mut i: u32 = 0;
         let mut slot = self.cycles.wrapping_rem(12 as i32 as u32);
         let mut address: u32 = 0;
-        let mut channel = self.channel;
+        let channel = self.channel;
         /* Update registers */
         if self.write_fm_data != 0 {
             /* Slot */
@@ -573,17 +573,17 @@ impl Ym3438Raw {
     }
 
     fn opn2_phase_calc_increment(&mut self) {
-        let mut chan = self.channel;
-        let mut slot = self.cycles;
+        let chan = self.channel;
+        let slot = self.cycles;
         let mut fnum = self.pg_fnum as u32;
-        let mut fnum_h = fnum >> 4 as i32;
+        let fnum_h = fnum >> 4 as i32;
         let mut fm: u32 = 0;
         let mut basefreq: u32 = 0;
-        let mut lfo = self.lfo_pm;
+        let lfo = self.lfo_pm;
         let mut lfo_l = (lfo as i32 & 0xf as i32) as u8;
-        let mut pms = self.pms[chan as usize];
-        let mut dt = self.dt[slot as usize];
-        let mut dt_l = (dt as i32 & 0x3 as i32) as u8;
+        let pms = self.pms[chan as usize];
+        let dt = self.dt[slot as usize];
+        let dt_l = (dt as i32 & 0x3 as i32) as u8;
         let mut detune = 0 as i32 as u8;
         let mut block: u8 = 0;
         let mut note: u8 = 0;
@@ -663,7 +663,7 @@ impl Ym3438Raw {
     }
 
     fn opn2_envelope_ssg_eg(&mut self) {
-        let mut slot = self.cycles;
+        let slot = self.cycles;
         let mut direction = 0 as i32 as u8;
         self.eg_ssg_pgrst_latch[slot as usize] = 0 as i32 as u8;
         self.eg_ssg_repeat_latch[slot as usize] = 0 as i32 as u8;
@@ -707,12 +707,12 @@ impl Ym3438Raw {
     }
 
     fn opn2_envelope_adsr(&mut self) {
-        let mut slot = self
+        let slot = self
             .cycles
             .wrapping_add(22 as i32 as u32)
             .wrapping_rem(24 as i32 as u32);
-        let mut nkon = self.eg_kon_latch[slot as usize];
-        let mut okon = self.eg_kon[slot as usize];
+        let nkon = self.eg_kon_latch[slot as usize];
+        let okon = self.eg_kon[slot as usize];
         let mut kon_event: u8 = 0;
         let mut koff_event: u8 = 0;
         let mut eg_off: u8 = 0;
@@ -816,7 +816,7 @@ impl Ym3438Raw {
         let mut rate: u8 = 0;
         let mut sum: u8 = 0;
         let mut inc = 0 as i32 as u8;
-        let mut slot = self.cycles;
+        let slot = self.cycles;
         let mut rate_sel: u8 = 0;
         /* Prepare increment */
         rate = (((self.eg_rate as i32) << 1 as i32) + self.eg_ksv as i32) as u8;
@@ -875,7 +875,7 @@ impl Ym3438Raw {
     }
 
     fn opn2_envelope_generate(&mut self) {
-        let mut slot = self
+        let slot = self
             .cycles
             .wrapping_add(23 as i32 as u32)
             .wrapping_rem(24 as i32 as u32);
@@ -918,13 +918,13 @@ impl Ym3438Raw {
             .cycles
             .wrapping_add(6 as i32 as u32)
             .wrapping_rem(24 as i32 as u32);
-        let mut channel = self.channel;
+        let channel = self.channel;
         let mut mod_0: i16 = 0;
         let mut mod1: i16 = 0;
         let mut mod2: i16 = 0;
-        let mut op = slot.wrapping_div(6 as i32 as u32);
-        let mut connect = self.connect[channel as usize];
-        let mut prevslot = self
+        let op = slot.wrapping_div(6 as i32 as u32);
+        let connect = self.connect[channel as usize];
+        let prevslot = self
             .cycles
             .wrapping_add(18 as i32 as u32)
             .wrapping_rem(24 as i32 as u32);
@@ -974,13 +974,13 @@ impl Ym3438Raw {
     }
 
     fn opn2_ch_generate(&mut self) {
-        let mut slot = self
+        let slot = self
             .cycles
             .wrapping_add(18 as i32 as u32)
             .wrapping_rem(24 as i32 as u32);
-        let mut channel = self.channel;
-        let mut op = slot.wrapping_div(6 as i32 as u32);
-        let mut test_dac = self.mode_test_2c[5 as i32 as usize] as u32;
+        let channel = self.channel;
+        let op = slot.wrapping_div(6 as i32 as u32);
+        let test_dac = self.mode_test_2c[5 as i32 as usize] as u32;
         let mut acc = self.ch_acc[channel as usize];
         let mut add = test_dac as i16;
         let mut sum = 0 as i32 as i16;
@@ -1007,10 +1007,10 @@ impl Ym3438Raw {
     }
 
     fn opn2_ch_output(&mut self) {
-        let mut cycles = self.cycles;
-        let mut slot = self.cycles;
+        let cycles = self.cycles;
+        let slot = self.cycles;
         let mut channel = self.channel;
-        let mut test_dac = self.mode_test_2c[5 as i32 as usize] as u32;
+        let test_dac = self.mode_test_2c[5 as i32 as usize] as u32;
         let mut out: i16 = 0;
         let mut sign: i16 = 0;
         let mut out_en: u32 = 0;
@@ -1070,12 +1070,12 @@ impl Ym3438Raw {
     }
 
     fn opn2_fm_generate(&mut self) {
-        let mut slot = self
+        let slot = self
             .cycles
             .wrapping_add(19 as i32 as u32)
             .wrapping_rem(24 as i32 as u32);
         /* Calculate phase */
-        let mut phase = ((self.fm_mod[slot as usize] as u32)
+        let phase = ((self.fm_mod[slot as usize] as u32)
             .wrapping_add(self.pg_phase[slot as usize] >> 10 as i32)
             & 0x3ff as i32 as u32) as u16;
         let mut quarter: u16 = 0;
@@ -1195,8 +1195,8 @@ impl Ym3438Raw {
     }
 
     fn opn2_key_on(&mut self) {
-        let mut slot = self.cycles;
-        let mut chan = self.channel;
+        let slot = self.cycles;
+        let chan = self.channel;
         /* Key On */
         self.eg_kon_latch[slot as usize] = self.mode_kon[slot as usize];
         self.eg_kon_csm[slot as usize] = 0 as i32 as u8;
@@ -1240,13 +1240,13 @@ impl Ym3438Raw {
         }
     }
 
-    pub fn opn2_set_chip_type(mut type_0: u32) {
+    pub fn opn2_set_chip_type(_type_0: u32) {
         todo!();
         //chip_type = type_0;
     }
 
-    pub fn opn2_clock(&mut self, mut buffer: &mut [i16]) {
-        let mut slot = self.cycles;
+    pub fn opn2_clock(&mut self, buffer: &mut [i16]) {
+        let slot = self.cycles;
         self.lfo_inc = self.mode_test_21[1 as i32 as usize];
         self.pg_read >>= 1 as i32;
         self.eg_read[1 as i32 as usize] >>= 1 as i32;
@@ -1392,7 +1392,7 @@ impl Ym3438Raw {
         };
     }
 
-    pub fn opn2_write(&mut self, mut port: u32, mut data: u8) {
+    pub fn opn2_write(&mut self, mut port: u32, data: u8) {
         port &= 3 as i32 as u32;
         self.write_data = (port << 7 as i32 & 0x100 as i32 as u32 | data as u32) as u16;
         if port & 1 as i32 as u32 != 0 {
@@ -1404,7 +1404,7 @@ impl Ym3438Raw {
         };
     }
 
-    pub fn opn2_set_test_pin(&mut self, mut value: u32) {
+    pub fn opn2_set_test_pin(&mut self, value: u32) {
         self.pin_test_in = (value & 1 as i32 as u32) as u8;
     }
 
@@ -1419,13 +1419,13 @@ impl Ym3438Raw {
         return (self.timer_a_overflow_flag as i32 | self.timer_b_overflow_flag as i32) as u32;
     }
 
-    pub fn opn2_read(&mut self, mut port: u32) -> u8 {
+    pub fn opn2_read(&mut self, port: u32) -> u8 {
         if port & 3 as i32 as u32 == 0 as i32 as u32
             || chip_type & ym3438_mode_readmode as i32 as u32 != 0
         {
             if self.mode_test_21[6 as i32 as usize] != 0 {
                 /* Read test data */
-                let mut slot = self
+                let slot = self
                     .cycles
                     .wrapping_add(18 as i32 as u32)
                     .wrapping_rem(24 as i32 as u32);
