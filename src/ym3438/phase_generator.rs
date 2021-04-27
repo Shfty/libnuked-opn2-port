@@ -21,22 +21,16 @@ impl PhaseGenerator {
 
     pub fn generate(&mut self, cycles: u32, registers: &Registers) {
         // Mask increment
-        let slot: u32 = cycles
-            .wrapping_add(20)
-            .wrapping_rem(24);
+        let slot: u32 = cycles.wrapping_add(20).wrapping_rem(24);
 
         if self.reset[slot as usize] != 0 {
             self.inc[slot as usize] = 0
         }
 
         // Phase step
-        let slot = cycles
-            .wrapping_add(19)
-            .wrapping_rem(24);
+        let slot = cycles.wrapping_add(19).wrapping_rem(24);
 
-        if self.reset[slot as usize] as i32 != 0
-            || registers.mode_test_21[3] as i32 != 0
-        {
+        if self.reset[slot as usize] as i32 != 0 || registers.mode_test_21[3] as i32 != 0 {
             self.phase[slot as usize] = 0
         }
 
@@ -91,13 +85,11 @@ impl PhaseGenerator {
             }
             let block = (kcode as i32 >> 2) as u8;
             let note = (kcode as i32 & 0x3) as u8;
-            let sum =
-                (block as i32 + 9 + ((dt_l as i32 == 3) as i32 | dt_l as i32 & 0x2))
-                    as u8;
+            let sum = (block as i32 + 9 + ((dt_l as i32 == 3) as i32 | dt_l as i32 & 0x2)) as u8;
             let sum_h = (sum as i32 >> 1) as u8;
             let sum_l = (sum as i32 & 0x1) as u8;
-            detune = (PG_DETUNE[((sum_l as i32) << 2 | note as i32) as usize]
-                >> (9 - sum_h as i32)) as u8
+            detune = (PG_DETUNE[((sum_l as i32) << 2 | note as i32) as usize] >> (9 - sum_h as i32))
+                as u8
         }
         if dt as i32 & 0x4 != 0 {
             basefreq = (basefreq as u32).wrapping_sub(detune as u32) as u32 as u32
@@ -105,8 +97,49 @@ impl PhaseGenerator {
             basefreq = (basefreq as u32).wrapping_add(detune as u32) as u32 as u32
         }
         basefreq &= 0x1ffff;
-        self.inc[slot as usize] =
-            basefreq.wrapping_mul(registers.multi[slot as usize] as u32) >> 1;
+        self.inc[slot as usize] = basefreq.wrapping_mul(registers.multi[slot as usize] as u32) >> 1;
         self.inc[slot as usize] &= 0xfffff;
+    }
+
+    pub fn fnum_block(&mut self, slot: u32, channel: u32, registers: &Registers) {
+        if registers.mode_ch3 != 0 {
+            // Channel 3 special mode
+            match slot {
+                1 => {
+                    // OP1
+                    self.fnum = registers.fnum_3ch[1];
+                    self.block = registers.block_3ch[1];
+                    self.kcode = registers.kcode_3ch[1]
+                }
+                7 => {
+                    // OP3
+                    self.fnum = registers.fnum_3ch[0];
+                    self.block = registers.block_3ch[0];
+                    self.kcode = registers.kcode_3ch[0]
+                }
+                13 => {
+                    // OP2
+                    self.fnum = registers.fnum_3ch[2];
+                    self.block = registers.block_3ch[2];
+                    self.kcode = registers.kcode_3ch[2]
+                }
+                _ => {
+                    // OP4
+                    self.fnum = registers.fnum
+                        [channel.wrapping_add(1).wrapping_rem(6) as usize];
+                    self.block = registers.block
+                        [channel.wrapping_add(1).wrapping_rem(6) as usize];
+                    self.kcode = registers.kcode
+                        [channel.wrapping_add(1).wrapping_rem(6) as usize]
+                }
+            }
+        } else {
+            self.fnum = registers.fnum
+                [channel.wrapping_add(1).wrapping_rem(6) as usize];
+            self.block = registers.block
+                [channel.wrapping_add(1).wrapping_rem(6) as usize];
+            self.kcode = registers.kcode
+                [channel.wrapping_add(1).wrapping_rem(6) as usize]
+        }
     }
 }

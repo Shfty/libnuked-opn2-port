@@ -131,46 +131,7 @@ impl Opn2 {
             &self.chip.lfo,
         );
 
-        // Prepare fnum & block
-        if self.chip.registers.mode_ch3 != 0 {
-            // Channel 3 special mode
-            match slot {
-                1 => {
-                    // OP1
-                    self.chip.phase_generator.fnum = self.chip.registers.fnum_3ch[1];
-                    self.chip.phase_generator.block = self.chip.registers.block_3ch[1];
-                    self.chip.phase_generator.kcode = self.chip.registers.kcode_3ch[1]
-                }
-                7 => {
-                    // OP3
-                    self.chip.phase_generator.fnum = self.chip.registers.fnum_3ch[0];
-                    self.chip.phase_generator.block = self.chip.registers.block_3ch[0];
-                    self.chip.phase_generator.kcode = self.chip.registers.kcode_3ch[0]
-                }
-                13 => {
-                    // OP2
-                    self.chip.phase_generator.fnum = self.chip.registers.fnum_3ch[2];
-                    self.chip.phase_generator.block = self.chip.registers.block_3ch[2];
-                    self.chip.phase_generator.kcode = self.chip.registers.kcode_3ch[2]
-                }
-                _ => {
-                    // OP4
-                    self.chip.phase_generator.fnum = self.chip.registers.fnum
-                        [self.chip.channel.wrapping_add(1).wrapping_rem(6) as usize];
-                    self.chip.phase_generator.block = self.chip.registers.block
-                        [self.chip.channel.wrapping_add(1).wrapping_rem(6) as usize];
-                    self.chip.phase_generator.kcode = self.chip.registers.kcode
-                        [self.chip.channel.wrapping_add(1).wrapping_rem(6) as usize]
-                }
-            }
-        } else {
-            self.chip.phase_generator.fnum = self.chip.registers.fnum
-                [self.chip.channel.wrapping_add(1).wrapping_rem(6) as usize];
-            self.chip.phase_generator.block = self.chip.registers.block
-                [self.chip.channel.wrapping_add(1).wrapping_rem(6) as usize];
-            self.chip.phase_generator.kcode = self.chip.registers.kcode
-                [self.chip.channel.wrapping_add(1).wrapping_rem(6) as usize]
-        }
+        self.chip.phase_generator.fnum_block(slot, self.chip.channel, &self.chip.registers);
 
         self.chip.lfo.update();
         self.chip.do_reg_write();
