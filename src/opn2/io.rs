@@ -20,16 +20,16 @@ pub struct Io {
 impl Io {
     pub fn clock(&mut self) {
         // Write signal check
-        self.write_a_en = (self.write_a as i32 & 0x3 == 0x1) as i32 as u8;
-        self.write_d_en = (self.write_d as i32 & 0x3 == 0x1) as i32 as u8;
-        self.write_a = ((self.write_a as i32) << 1) as u8;
-        self.write_d = ((self.write_d as i32) << 1) as u8;
+        self.write_a_en = (self.write_a & 0x3 == 0x1) as u8;
+        self.write_d_en = (self.write_d & 0x3 == 0x1) as u8;
+        self.write_a <<= 1;
+        self.write_d <<= 1;
 
         // Busy counter
         self.busy = self.write_busy;
-        self.write_busy_cnt = (self.write_busy_cnt as i32 + self.write_busy as i32) as u8;
-        self.write_busy = (self.write_busy as i32 != 0 && self.write_busy_cnt as i32 >> 5 == 0
-            || self.write_d_en as i32 != 0) as i32 as u8;
-        self.write_busy_cnt = (self.write_busy_cnt as i32 & 0x1f) as u8;
+        self.write_busy_cnt += self.write_busy;
+        self.write_busy =
+            (self.write_busy != 0 && self.write_busy_cnt >> 5 == 0 || self.write_d_en != 0) as u8;
+        self.write_busy_cnt &= 0x1f;
     }
 }
