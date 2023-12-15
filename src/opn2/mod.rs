@@ -28,6 +28,8 @@ use crate::rom::{CH_OFFSET, FN_NOTE, OP_OFFSET};
 
 use traits::Chip;
 
+use opn2_trait::Opn2Trait;
+
 use std::marker::PhantomData;
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -525,5 +527,46 @@ where
         let (mol, mor) = C::output(self, cycles, test_dac, out);
         self.mol = mol;
         self.mor = mor;
+    }
+}
+
+impl<C> Opn2Trait for Opn2<C>
+where
+    C: Chip + Send,
+{
+    /// Reset emulated chip
+    fn reset(&mut self) {
+        self.reset()
+    }
+
+    /// Advances emulated chip state by 1 internal clock (6 master clocks).
+    /// Returns signed 9-bit MOL, MOR pin states.
+    fn clock(&mut self) -> (i16, i16) {
+        self.clock()
+    }
+
+    /// Write 8-bit data to port.
+    fn write(&mut self, port: u32, data: u8) {
+        self.write(port, data)
+    }
+
+    /// Set TEST pin value.
+    fn set_test_pin(&mut self, value: u32) {
+        self.set_test_pin(value)
+    }
+
+    /// Read TEST pin value.
+    fn read_test_pin(&self) -> u32 {
+        self.read_test_pin()
+    }
+
+    /// Read IRQ pin value.
+    fn read_irq_pin(&self) -> u32 {
+        self.read_irq_pin()
+    }
+
+    /// Read chip status.
+    fn read(&mut self, port: u32) -> u8 {
+        self.read(port)
     }
 }
